@@ -1,0 +1,13 @@
+{
+  "applications": {
+    "Permutas SEP": {
+      "applicationId": "PPIfD7DOoAuMI1ikE5YRiyF5nLHRT2JwSTBlcypJ"
+    },
+    "Permutas SEP Live": {
+      "applicationId": "M3e2X9FBP4yveZ7eRFVgQjCrPyWJKlP94wRsjcM8"
+    },
+    "_default": {
+      "link": "Permutas SEP"
+    }
+  }
+}
