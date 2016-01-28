@@ -110,9 +110,9 @@ Parse.Cloud.afterSave("PSScrapedPost", function(request) {
 	        "email" : request.object.get("email")
 	    });
 
-		Parse.Cloud.run('sendEmail', { emails: email, template_name : "tulibroinvitation", from : "jorge@permutassep.com" })
+		Parse.Cloud.run('sendEmailTemplate', { emails: email, template_name : "tulibroinvitation", from : "jorge@permutassep.com" })
 		.then(function(resp) {
-			console.log("Function sendEmail ran successfully!")
+			console.log("Function sendEmailTemplate ran successfully!")
 		});
 
 		var Email = Parse.Object.extend("Email");
@@ -140,7 +140,7 @@ Parse.Cloud.afterSave("LPEmail", function(request) {
         "email" : request.object.get("email")
     });
 
-	Parse.Cloud.run('sendEmail', { emails: email, template_name : "lpsignup", subject : "Gracias por tu interés!" })
+	Parse.Cloud.run('sendEmailTemplate', { emails: email, template_name : "lpsignup", subject : "Gracias por tu interés!" })
 	.then(function(resp) {
 		console.log("New user has signed up within the landing page.")
 	});
@@ -175,7 +175,7 @@ Parse.Cloud.afterSave("LPContact", function(request) {
         "email" : request.object.get("email")
     });
 
-	Parse.Cloud.run('sendEmail', { emails: email, template_name : "lpformcontact" })
+	Parse.Cloud.run('sendEmailTemplate', { emails: email, template_name : "lpformcontact" })
 	.then(function(resp) {
 		console.log("Thanks for contact - Email sent!")
 	});
@@ -278,7 +278,7 @@ Parse.Cloud.define("emptyMelodysoft", function(request, response) {
 	});
 });
 
-Parse.Cloud.define("sendEmail", function(request, response) {
+Parse.Cloud.define("sendEmailTemplate", function(request, response) {
 
 	var Mandrill = require('cloud/mandrill.js');
 
