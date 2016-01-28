@@ -321,6 +321,10 @@ Parse.Cloud.define("sendEmail", function(request, response) {
 		});
 });
 
+/*
+* Cloud Code Job Definitions
+*/
+
 Parse.Cloud.job("testJob", function(request, status) {
 
     var counter = 0;
@@ -346,6 +350,10 @@ Parse.Cloud.job("testJob", function(request, status) {
         status.error("Uh oh, something went wrong!");
     });
 });
+
+/*
+* Helper functions/code sytax/utilities/etc
+*/
 
 // Parse.Cloud.define("testParams", function(request, response) {
 // 	// This prints:
