@@ -1,3 +1,7 @@
+/*
+* Before & after save trigger functions definitions
+*/
+
 Parse.Cloud.afterSave("PSPosts", function(request) {
 
 	// Query for alle PSPosts that matches the city and the state fields
@@ -126,9 +130,7 @@ Parse.Cloud.afterSave("PSScrapedPost", function(request) {
 		    // error is a Parse.Error with an error code and message.
 		  }
 		});
-
 	}
-
 });
 
 Parse.Cloud.afterSave("LPEmail", function(request) {
@@ -179,12 +181,6 @@ Parse.Cloud.afterSave("LPContact", function(request) {
 	});
 });
 
-// Parse.Cloud.define("testParams", function(request, response) {
-// 	// This prints:
-// 	// request.params.emails['email'] = lalongooo@yahoo.com
-// 	response.success("request.params.emails.length = " + request.params.emails.length);
-// });
-
 Parse.Cloud.beforeSave("Email", function(request, response) {
 
 	var email = [];
@@ -217,7 +213,9 @@ Parse.Cloud.beforeSave("Email", function(request, response) {
 });
 
 
-
+/*
+* Cloud Code Functions Definitions
+*/
 
 Parse.Cloud.define("countTuLibro", function(request, response) {
 	var ScrapedPost = Parse.Object.extend("PSScrapedPost");
@@ -348,3 +346,9 @@ Parse.Cloud.job("testJob", function(request, status) {
         status.error("Uh oh, something went wrong!");
     });
 });
+
+// Parse.Cloud.define("testParams", function(request, response) {
+// 	// This prints:
+// 	// request.params.emails['email'] = lalongooo@yahoo.com
+// 	response.success("request.params.emails.length = " + request.params.emails.length);
+// });
