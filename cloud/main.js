@@ -96,42 +96,42 @@ Parse.Cloud.afterSave("PSPosts", function(request) {
 	});
 });
 
-// Parse.Cloud.afterSave("PSScrapedPost", function(request) {
+Parse.Cloud.afterSave("PSScrapedPost", function(request) {
 
-// 	// Después de guardar un ScrapedPost:
-// 	// Enviar mail con link de Google Play
-// 	// Guardar Email
+	// Después de guardar un ScrapedPost:
+	// Enviar mail con link de Google Play
+	// Guardar Email
 
-// 	if(request.object.get("email"))
-// 	{
+	if(request.object.get("email"))
+	{
 
-// 		var email = [];
-// 		email.push({
-// 	        "email" : request.object.get("email")
-// 	    });
+		var email = [];
+		email.push({
+	        "email" : request.object.get("email")
+	    });
 
-// 		Parse.Cloud.run('sendEmailTemplate', { emails: email, template_name : "tulibroinvitation", from : "jorge@permutassep.com" })
-// 		.then(function(resp) {
-// 			console.log("Function sendEmailTemplate ran successfully!")
-// 		});
+		Parse.Cloud.run('sendEmailTemplate', { emails: email, template_name : "tulibroinvitation", from : "jorge@permutassep.com" })
+		.then(function(resp) {
+			console.log("Function sendEmailTemplate ran successfully!")
+		});
 
-// 		var Email = Parse.Object.extend("Email");
-// 		var email = new Email();
+		var Email = Parse.Object.extend("Email");
+		var email = new Email();
 
-// 		email.save({
-// 		  email: request.object.get("email"),
-// 		  source: "tulibrodevisitas"
-// 		}, {
-// 		  success: function(email) {
-// 		    // The object was saved successfully.
-// 		  },
-// 		  error: function(email, error) {
-// 		    // The save failed.
-// 		    // error is a Parse.Error with an error code and message.
-// 		  }
-// 		});
-// 	}
-// });
+		email.save({
+		  email: request.object.get("email"),
+		  source: "tulibrodevisitas"
+		}, {
+		  success: function(email) {
+		    // The object was saved successfully.
+		  },
+		  error: function(email, error) {
+		    // The save failed.
+		    // error is a Parse.Error with an error code and message.
+		  }
+		});
+	}
+});
 
 Parse.Cloud.afterSave("LPEmail", function(request) {
 	var Mandrill = require('cloud/mandrill.js');
@@ -353,14 +353,14 @@ Parse.Cloud.job("testJob", function(request, status) {
 
 
 Parse.Cloud.job("postDateMigration", function(request, status) {
-  
+
   // Set up to modify user data
   Parse.Cloud.useMasterKey();
-  
+
   // Indicate the moment module is required
   var moment = require('cloud/moment');
   var counter = 0;
-  
+
   // Query for all episodes
   var PSScrapedPost = Parse.Object.extend("PSScrapedPost");
   var query = new Parse.Query(PSScrapedPost);
@@ -369,13 +369,13 @@ Parse.Cloud.job("postDateMigration", function(request, status) {
   query.limit(200);
 
   query.find({
-    success: function(results) {      
+    success: function(results) {
       var i=0;
-      
+
       while (results[i]){
 
         // 28 de Enero del 2016 - 10:04:28
-        
+
         var convertedPostDate = results[i].get('post_date').replace(' de ','-').replace(' del ','-').replace('- ','');
         convertedPostDate = convertedPostDate.replace('Enero','01');
 	    convertedPostDate = convertedPostDate.replace('Febrero','02');
@@ -395,7 +395,7 @@ Parse.Cloud.job("postDateMigration", function(request, status) {
         i++;
 
       }
-      
+
       Parse.Object.saveAll(results);
         status.success("Date migration completed successfully.");
       },
@@ -409,13 +409,13 @@ Parse.Cloud.job("postDateMigration", function(request, status) {
 Parse.Cloud.job('postDateMigrationPromise', function (request, status) {
 
   Parse.Cloud.useMasterKey();
-  
+
   var query = new Parse.Query("PSScrapedPost");
   query.doesNotExist("publication_date");
   query.doesNotExist("host")
 
   query.each(function (scrapedPost) {
-    
+
     var moment = require('cloud/moment');
 
 
