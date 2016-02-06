@@ -411,29 +411,41 @@ Parse.Cloud.job('postDateMigrationPromise', function (request, status) {
   Parse.Cloud.useMasterKey();
 
   var query = new Parse.Query("PSScrapedPost");
-  query.doesNotExist("publication_date");
-  query.doesNotExist("host")
+  
+  // Condition to fix dates from tulibrodevisitas.com
+  query.doesNotExist("host");
+
+  // Condition to fix dates from gbooks1.melodysoft.com/app?ID=pizarra1
+  query.exists("host");
 
   query.each(function (scrapedPost) {
 
     var moment = require('cloud/moment');
 
+    /**
+    * This is the way to fix the dates of the publication from tulibrodevisitas.com
+    */
 
-    var convertedPostDate = scrapedPost.get('post_date').replace(' de ','-').replace(' del ','-').replace('- ','');
-    convertedPostDate = convertedPostDate.replace('Enero','01');
-    convertedPostDate = convertedPostDate.replace('Febrero','02');
-    convertedPostDate = convertedPostDate.replace('Marzo','03');
-    convertedPostDate = convertedPostDate.replace('Abril','04');
-    convertedPostDate = convertedPostDate.replace('Mayo','05');
-    convertedPostDate = convertedPostDate.replace('Junio','06');
-    convertedPostDate = convertedPostDate.replace('Julio','07');
-    convertedPostDate = convertedPostDate.replace('Agosto','08');
-    convertedPostDate = convertedPostDate.replace('Septiembre','09');
-    convertedPostDate = convertedPostDate.replace('Octubre','10');
-    convertedPostDate = convertedPostDate.replace('Noviembre','11');
-    convertedPostDate = convertedPostDate.replace('Diciembre','12');
+    // var convertedPostDate = scrapedPost.get('post_date').replace(' de ','-').replace(' del ','-').replace('- ','');
+    // convertedPostDate = convertedPostDate.replace('Enero','01');
+    // convertedPostDate = convertedPostDate.replace('Febrero','02');
+    // convertedPostDate = convertedPostDate.replace('Marzo','03');
+    // convertedPostDate = convertedPostDate.replace('Abril','04');
+    // convertedPostDate = convertedPostDate.replace('Mayo','05');
+    // convertedPostDate = convertedPostDate.replace('Junio','06');
+    // convertedPostDate = convertedPostDate.replace('Julio','07');
+    // convertedPostDate = convertedPostDate.replace('Agosto','08');
+    // convertedPostDate = convertedPostDate.replace('Septiembre','09');
+    // convertedPostDate = convertedPostDate.replace('Octubre','10');
+    // convertedPostDate = convertedPostDate.replace('Noviembre','11');
+    // convertedPostDate = convertedPostDate.replace('Diciembre','12');
+    // scrapedPost.set('publication_date', new Date(moment(convertedPostDate, "DD-MM-YYYY HH:mm:ss")));
 
-    scrapedPost.set('publication_date', new Date(moment(convertedPostDate, "DD-MM-YYYY HH:mm:ss")));
+    /**
+	* This is the way to fix the dates of the publication from gbooks1.melodysoft.com/app?ID=pizarra1
+    */
+    scrapedPost.set('publication_date', new Date(moment(scrapedPost.get('post_date'), "DD/MM/YYYY HH:mm")));
+    scrapedPost.set('dateFixed', true);
 
     return scrapedPost.save();
 
