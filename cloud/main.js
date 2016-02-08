@@ -351,7 +351,6 @@ Parse.Cloud.job("testJob", function(request, status) {
     });
 });
 
-
 Parse.Cloud.job("postDateMigration", function(request, status) {
 
   // Set up to modify user data
@@ -454,8 +453,60 @@ Parse.Cloud.job('postDateMigrationPromise', function (request, status) {
   }, function (error) {
     status.error(String(error));
   });
-
 });
+
+Parse.Cloud.job('getPhoneNumbers', function (request, status) {
+
+  Parse.Cloud.useMasterKey();
+
+  var query = new Parse.Query("PSScrapedPost");  
+  query.doesNotExist("phoneNumbers");
+  query.each(function (scrapedPost) {
+
+	var post = scrapedPost.get("post");
+	var phoneNumbers = [];
+  	var regExp = /(\d{4}[-\.\s]??\d{6}|\d{3}[-\.\s]??\d{3}[-\.\s]??\d{2}[-\.\s]??\d{2}|\d{2}[-\.\s]??\d{2}[-\.\s]??\d{3}[-\.\s]??\d{3}|\d{2}[-\.\s]??\d{2}[-\.\s]??\d{2}[-\.\s]??\d{2}[-\.\s]??\d{2}|\d{2}[-\.\s]??\d{2}[-\.\s]??\d{3}[-\.\s]??\d{1}[-\.\s]??\d{2}|\d{3}[-\.\s]??\d{2}[-\.\s]??\d{1}[-\.\s]??\d{2}[-\.\s]??\d{2}|\d{3}[-\.\s]??\d{1}[-\.\s]??\d{2}[-\.\s]??\d{2}[-\.\s]??\d{2}|\d{3}[-\.\s]??\d{2}[-\.\s]??\d{2}[-\.\s]??\d{1}[-\.\s]??\d{2}|\d{3}[-\.\s]??\d{2}[-\.\s]??\d{2}[-\.\s]??\d{1}[-\.\s]??\d{2}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4})/g;	
+	var match = regExp.exec(post);
+
+	while (match != null) {
+		phoneNumbers.push(match[0]);
+	    match = regExp.exec(post);
+	}
+
+	scrapedPost.set("phoneNumbers", phoneNumbers);
+	scrapedPost.save();
+
+	/**
+	* If no phone numbers where found, retrieve all the digits
+	* within the text and see if it could be a possible phone number.
+	*/
+	if(phoneNumbers.length == 0) {
+
+        post = post.replace(/[^\d\+]/g,'');
+        if (post.substr(0, 1) == "+") {
+        	post = "+" + post.replace(/[^\d]/g,'');
+        } else {
+        	post = post.replace(/[^\d]/g,'');
+        }
+        
+        if (post.length >= 10)
+        {
+        	phoneNumbers.push(post);
+        	scrapedPost.set("possiblePhoneNumbers", phoneNumbers);
+        	scrapedPost.save();
+        }		        
+	}
+    
+    return scrapedPost.save();
+
+  }).then(function(){
+    status.success('Done');
+  }, function (error) {
+    status.error(String(error));
+  });
+});
+
+
 /*
 * Helper functions/code sytax/utilities/etc
 */
