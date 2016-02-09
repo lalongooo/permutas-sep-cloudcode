@@ -131,6 +131,51 @@ Parse.Cloud.afterSave("PSScrapedPost", function(request) {
 		  }
 		});
 	}
+
+	var phoneNumbers = request.object.get("phoneNumbers");
+	var possiblePhoneNumbers = request.object.get("possiblePhoneNumbers");
+
+
+	if(phoneNumbers.length > 0 || (possiblePhoneNumbers && possiblePhoneNumbers.length > 0))
+	{
+
+		var a = JSON.stringify(phoneNumbers);
+		var b = JSON.stringify(possiblePhoneNumbers);
+		var Mandrill = require('cloud/mandrill.js');
+
+		Mandrill.sendEmail({
+		message: {
+		  text:
+		  	"Phone numbers are: "
+		  	+ "\n\n"
+		  	+ a
+		  	+ "\n\n"
+		  	+ "Possible phone numbers are: " + "\n\n" + b + "." + "\n\n"
+		  	+ "Post: "
+		  	+ "\n\n"
+		  	+ request.object.get("post")
+		  	+ "\n\n"
+		  	+ request.object.get("name"),
+
+		  subject: "New post with phone numbers",
+		  from_email: "hola@permutassep.com",
+		  from_name: "Permutas SEP",
+		  to: [
+		    {
+		      email: "hdez.jeduardo@gmail.com"
+		    }
+		  ]
+		},
+		async: true
+		}, {
+			success: function(httpResponse) {
+				console.log("Phone numbers sent!");
+			},
+			error: function(httpResponse) {
+				console.log("Phone numbers were not sent!");
+			}
+		});
+	}
 });
 
 Parse.Cloud.afterSave("LPEmail", function(request) {
