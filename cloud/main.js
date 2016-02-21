@@ -18,7 +18,7 @@ Parse.Cloud.afterSave("PSPost", function(request) {
                 for (var i = 0; i < results.length; ++i)
                 {
                     var post = results[i];
-                    usersIds.push(post.get("user"));
+                    usersIds.push(parseInt(post.get("user")));
                 }
  
                 /*
@@ -30,7 +30,8 @@ Parse.Cloud.afterSave("PSPost", function(request) {
                 Parse.Push.send({
                     where: queryInstCity,
                     data: {
-                        alert: "Se acaba de publicar una permuta del municipio en el que estás interesado!"
+                        alert: "Se acaba de publicar una permuta del municipio en el que estás interesado!",
+						PSPostId: request.object.get("id")
                     }
                 },
                 {
@@ -64,7 +65,7 @@ Parse.Cloud.afterSave("PSPost", function(request) {
                 for (var i = 0; i < results.length; ++i)
                 {
                     var post = results[i];
-                    usersIds.push(post.get("user"));
+                    usersIds.push(parseInt(post.get("user")));
                 }
  
                 /*
@@ -76,7 +77,8 @@ Parse.Cloud.afterSave("PSPost", function(request) {
                 Parse.Push.send({
                     where: queryInstState,
                     data: {
-                        alert: "Se acaba de publicar una permuta del estado en el que estás interesado!"
+                        alert: "Se acaba de publicar una permuta del municipio en el que estás interesado!",
+						PSPostId: request.object.get("id")
                     }
                 },
                 {
