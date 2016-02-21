@@ -2,10 +2,10 @@
 * Before & after save trigger functions definitions
 */
 
-Parse.Cloud.afterSave("PSPosts", function(request) {
+Parse.Cloud.afterSave("PSPost", function(request) {
 
 	// Query for alle PSPosts that matches the city and the state fields
-	var queryCities = new Parse.Query("PSPosts");
+	var queryCities = new Parse.Query("PSPost");
 	queryCities.notEqualTo("user",  request.object.get("user"));
 	// queryCities.equalTo("place_from_state", request.object.get("place_to_state"));
 	// queryCities.equalTo("place_from_city",  request.object.get("place_to_city"));
@@ -22,7 +22,7 @@ Parse.Cloud.afterSave("PSPosts", function(request) {
 				for (var i = 0; i < results.length; ++i)
 				{
 					var post = results[i];
-					usersIds.push(post.get("user"));
+					usersIds.push(parseInt(post.get("user")));
 				}
 
 				/*
@@ -34,12 +34,13 @@ Parse.Cloud.afterSave("PSPosts", function(request) {
 				Parse.Push.send({
 					where: queryInstCity,
 					data: {
-						alert: "Se acaba de publicar una permuta del municipio en el que estás interesado!"
+						alert: "Se acaba de publicar una permuta del municipio en el que estás interesado!",
+						PSPostId: request.object.get("id")
 					}
 				},
 				{
-					success: function() { console.log("Cities push notificaions, success!") },
-					error: function(error) { console.log("Cities push notificaions, error!") }
+					success: function() { console.log("Cities push notifications, success!") },
+					error: function(error) { console.log("Cities push notifications, error!") }
 				});
 			}
 		},
@@ -51,7 +52,7 @@ Parse.Cloud.afterSave("PSPosts", function(request) {
 
 
 	// Query for alle PSPosts that matches only the state field
-	var queryStates = new Parse.Query("PSPosts");
+	var queryStates = new Parse.Query("PSPost");
 	queryStates.notEqualTo("user",  request.object.get("user"));
 	// queryStates.equalTo("place_from_state", request.object.get("place_to_state"));
 	// queryStates.notEqualTo("place_from_city",  request.object.get("place_to_city"));
@@ -68,7 +69,7 @@ Parse.Cloud.afterSave("PSPosts", function(request) {
 				for (var i = 0; i < results.length; ++i)
 				{
 					var post = results[i];
-					usersIds.push(post.get("user"));
+					usersIds.push(parseInt(post.get("user")));
 				}
 
 				/*
@@ -80,12 +81,13 @@ Parse.Cloud.afterSave("PSPosts", function(request) {
 				Parse.Push.send({
 					where: queryInstState,
 					data: {
-						alert: "Se acaba de publicar una permuta del estado en el que estás interesado!"
+						alert: "Se acaba de publicar una permuta del estado en el que estás interesado!",
+						PSPostId: request.object.get("id")
 					}
 				},
 				{
-					success: function() { console.log("States push notificaions, success!") },
-					error: function(error) { console.log("States push notificaions, error!") }
+					success: function() { console.log("States push notifications, success!") },
+					error: function(error) { console.log("States push notifications, error!") }
 				});
 			}
 		},
