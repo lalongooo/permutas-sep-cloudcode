@@ -77,7 +77,7 @@ Parse.Cloud.afterSave("PSPost", function(request) {
                 Parse.Push.send({
                     where: queryInstState,
                     data: {
-                        alert: "Se acaba de publicar una permuta del municipio en el que estás interesado!",
+                        alert: "Se acaba de publicar una permuta del estado en el que estás interesado!",
 						PSPostId: request.object.get("id")
                     }
                 },
@@ -92,6 +92,55 @@ Parse.Cloud.afterSave("PSPost", function(request) {
             console.log("Query error!!");
         }
     });
+
+
+    // Query for all PSPost that matches all criteria
+    var queryTowns = new Parse.Query("PSPost");
+    queryTowns.notEqualTo("user",  request.object.get("user"));
+    queryTowns.equalTo("place_from_state", request.object.get("place_to_state"));
+    queryTowns.equalTo("place_from_city",  request.object.get("place_to_city"));
+    queryTowns.equalTo("place_from_town",  request.object.get("place_to_town"));
+    queryTowns.equalTo("place_to_state", request.object.get("place_from_state"));
+    queryTowns.equalTo("place_to_city",  request.object.get("place_from_city"));
+    queryTowns.equalTo("place_to_town",  request.object.get("place_from_town"));
+    queryTowns.find({
+        success: function(results)
+        {
+            if(results.length > 0)
+            {
+                var usersIds = [];
+                for (var i = 0; i < results.length; ++i)
+                {
+                    var post = results[i];
+                    usersIds.push(parseInt(post.get("user")));
+                }
+ 
+                /*
+                * Send the push notifications
+                */
+                Parse.Cloud.useMasterKey();
+                var queryInstState = new Parse.Query(Parse.Installation);
+                queryInstState.containedIn("PSUser", usersIds);
+                Parse.Push.send({
+                    where: queryInstState,
+                    data: {
+                        alert: "Se acaba de publicar una permuta de la localidad en la que estás interesado!",
+						PSPostId: request.object.get("id")
+                    }
+                },
+                {
+                    success: function() { console.log("States push notificaions, success!") },
+                    error: function(error) { console.log("States push notificaions, error!") }
+                });
+            }
+        },
+        error: function()
+        {
+            console.log("Query error!!");
+        }
+    });
+
+
 });
 
 
