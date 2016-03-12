@@ -3,9 +3,9 @@ Parse.Cloud.afterSave("PSPost", function(request) {
     // Query for alle PSPost that matches the city and the state fields
     var queryCities = new Parse.Query("PSPost");
     queryCities.notEqualTo("user",  request.object.get("user"));
-    // queryCities.equalTo("place_from_state", request.object.get("place_to_state"));
-    // queryCities.equalTo("place_from_city",  request.object.get("place_to_city"));
-    // queryCities.notEqualTo("place_from_town",  request.object.get("place_to_town"));
+    queryCities.equalTo("place_from_state", request.object.get("place_to_state"));
+    queryCities.equalTo("place_from_city",  request.object.get("place_to_city"));
+    queryCities.notEqualTo("place_from_town",  request.object.get("place_to_town"));
     queryCities.equalTo("place_to_state", request.object.get("place_from_state"));
     queryCities.equalTo("place_to_city",  request.object.get("place_from_city"));
     queryCities.notEqualTo("place_to_town",  request.object.get("place_from_town"));
@@ -50,9 +50,9 @@ Parse.Cloud.afterSave("PSPost", function(request) {
     // Query for alle PSPost that matches only the state field
     var queryStates = new Parse.Query("PSPost");
     queryStates.notEqualTo("user",  request.object.get("user"));
-    // queryStates.equalTo("place_from_state", request.object.get("place_to_state"));
-    // queryStates.notEqualTo("place_from_city",  request.object.get("place_to_city"));
-    // queryStates.notEqualTo("place_from_town",  request.object.get("place_to_town"));
+    queryStates.equalTo("place_from_state", request.object.get("place_to_state"));
+    queryStates.notEqualTo("place_from_city",  request.object.get("place_to_city"));
+    queryStates.notEqualTo("place_from_town",  request.object.get("place_to_town"));
     queryStates.equalTo("place_to_state", request.object.get("place_from_state"));
     queryStates.notEqualTo("place_to_city",  request.object.get("place_from_city"));
     queryStates.notEqualTo("place_to_town",  request.object.get("place_from_town"));
