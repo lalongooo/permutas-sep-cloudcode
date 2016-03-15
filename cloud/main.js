@@ -353,19 +353,24 @@ Parse.Cloud.define("sendEmailTemplate", function(request, response) {
 		});
 });
 
-Parse.Cloud.define("sendGridSendEmail", function(request, response) {
+Parse.Cloud.define("sendgridSendEmail", function(request, response) {
 	Parse.Cloud.httpRequest({
 	  method: 'POST',
 	  url: 'https://api.sendgrid.com/api/mail.send.json',
 	  body: {
 		api_user: "lalongooo",
 		api_key: "Sand191205-",
-		to: "hdez.jeduardo@gmail.com",
-		toname: "Jorge Hernandez",
-		subject: "Sendgrid Email Using the API",
-		text: "This is the text version of the Email",
-		html: "<b>This is the text version of the Email<b>",
-		from: "hola@permutassep.com"
+		
+		subject: request.params.subject,
+
+		to: request.params.to,
+		from: "hola@permutassep.com",
+		fromname: "Permutas SEP",
+
+		
+		text: request.params.text,
+		html: request.params.html
+		
 	  }
 	}).then(function(httpResponse) {	  
 		console.error('Status. ' + httpResponse.status + ". Message: " + httpResponse.text);
@@ -558,6 +563,41 @@ Parse.Cloud.job('getPhoneNumbers', function (request, status) {
   }, function (error) {
     status.error(String(error));
   });
+});
+
+Parse.Cloud.job('sendEmailCampaign', function (request, status) {
+  
+  var Email = Parse.Object.extend("EmailTest");
+  var query = new Parse.Query(Email);
+  query.doesNotExist("campaign15032016");
+  query.each(function (email) {
+    
+    var EmailTemplate = Parse.Object.extend("EmailTemplate");
+    var queryTemplate = new Parse.Query(EmailTemplate);
+    queryTemplate.equalTo("TemplateName","march-2016");
+    queryTemplate.first().then(function(template) {
+
+      Parse.Cloud.run('sendgridSendEmail', {
+
+      	subject : "Te ayudamos a encontrar tu permuta",
+		to : email.get("email"),
+		text : template.get("TextVersion"),
+		html : template.get("HtmlContent")
+
+      }).then(function(resp) {      	
+        console.log("Function sendgridSendEmail ran successfully!")
+      });
+
+    });
+    email.set('campaign15032016', true);
+    return email.save();
+    
+  }).then(function() {
+    status.success('Done');
+  }, function (error) {
+    status.error(String(error));
+  });
+
 });
 
 
