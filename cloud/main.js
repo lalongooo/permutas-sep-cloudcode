@@ -353,6 +353,28 @@ Parse.Cloud.define("sendEmailTemplate", function(request, response) {
 		});
 });
 
+Parse.Cloud.define("sendGridSendEmail", function(request, response) {
+	Parse.Cloud.httpRequest({
+	  method: 'POST',
+	  url: 'https://api.sendgrid.com/api/mail.send.json',
+	  body: {
+		api_user: "lalongooo",
+		api_key: "Sand191205-",
+		to: "hdez.jeduardo@gmail.com",
+		toname: "Jorge Hernandez",
+		subject: "Sendgrid Email Using the API",
+		text: "This is the text version of the Email",
+		html: "<b>This is the text version of the Email<b>",
+		from: "hola@permutassep.com"
+	  }
+	}).then(function(httpResponse) {	  
+		console.error('Status. ' + httpResponse.status + ". Message: " + httpResponse.text);
+		response.success('Status. ' + httpResponse.status + ". Message: " + httpResponse.text)
+	}, function(httpResponse) {	  
+		console.error('Status. ' + httpResponse.status + ". Message: " + httpResponse.text);
+		response.error('Status. ' + httpResponse.status + ". Message: " + httpResponse.text)
+	});
+});
 /*
 * Cloud Code Job Definitions
 */
