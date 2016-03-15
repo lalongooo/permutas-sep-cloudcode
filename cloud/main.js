@@ -117,20 +117,33 @@ Parse.Cloud.afterSave("PSScrapedPost", function(request) {
 			console.log("Function sendEmailTemplate ran successfully!")
 		});
 
-		var Email = Parse.Object.extend("Email");
-		var email = new Email();
 
-		email.save({
-		  email: request.object.get("email"),
-		  source: "tulibrodevisitas"
-		}, {
-		  success: function(email) {
-		    // The object was saved successfully.
-		  },
-		  error: function(email, error) {
-		    // The save failed.
-		    // error is a Parse.Error with an error code and message.
-		  }
+		/**
+		* Verify if the email has been already registered from the app.
+		*/
+		var query = new Parse.Query(Parse.User);
+		query.equalTo("email", request.object.get("email"));
+		query.find({
+			success: function(results)
+			{
+				if (results.length == 0) {
+
+					var Email = Parse.Object.extend("Email");
+					var email = new Email();
+
+					email.save({
+					  email: request.object.get("email"),
+					  source: "tulibrodevisitas"
+					});
+
+				} else {
+					console.log("Email already registered within the app");
+				}
+			},
+			error: function()
+			{
+				console.error("Error when validating " + request.object.get("email") + " against the User class");
+			}
 		});
 	}
 
@@ -209,34 +222,26 @@ Parse.Cloud.afterSave("LPContact", function(request) {
 });
 
 Parse.Cloud.beforeSave("Email", function(request, response) {
-
-	var email = [];
-	email.push({
-        "email" : request.object.get("email")
+	
+	var Email = Parse.Object.extend("Email");
+	var query = new Parse.Query(Email);
+    query.equalTo("email", request.object.get("email"));
+    console.log('request.object.get("email") is equal to: ' + request.object.get("email")); 
+    query.first({
+      success: function(object) {
+        if (object) {
+        	console.log("Object equals to " + object);
+        	response.error("Email already exists");
+        } else {
+        	console.log("Email saved correctly");
+        	response.success();
+        }
+      },
+      error: function(error) {
+        response.error("Could not save new email");
+      }
     });
 
-	var query = new Parse.Query(Parse.User);
-	query.equalTo("email", request.object.get("email"));
-	query.find({
-		success: function(results)
-		{
-			if (results.length == 0){
-
-				// Parse.Cloud.run('sendEmail', { emails: email })
-				// .then(function(resp) {
-				// 	console.log("Function sendEmail ran successfully.")
-				// });
-
-				response.success();
-			} else {
-				response.error("Email already registered within the app");
-			}
-		},
-		error: function()
-		{
-			response.error("An error occurred while trying to save " + request.object.get("email"));
-		}
-	});
 });
 
 
