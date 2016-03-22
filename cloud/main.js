@@ -112,10 +112,15 @@ Parse.Cloud.afterSave("PSScrapedPost", function(request) {
 	        "email" : request.object.get("email")
 	    });
 
-		Parse.Cloud.run('sendEmailTemplate', { emails: email, template_name : "tulibroinvitation", from : "jorge@permutassep.com" })
-		.then(function(resp) {
-			console.log("Function sendEmailTemplate ran successfully!")
-		});
+		Parse.Cloud.run('sendgridSendEmailTest',
+			{
+			  template_name: "tulibroinvitation",
+			  subject: "Te ayudamos a encontrar tu permuta",
+			  to: request.object.get("email"),
+			  from: "hola@permutassep.com",
+			  from_name: "Permutas SEP"
+			}
+		);
 
 
 		/**
@@ -174,51 +179,40 @@ Parse.Cloud.afterSave("PSScrapedPost", function(request) {
 });
 
 Parse.Cloud.afterSave("LPEmail", function(request) {
-	var Mandrill = require('cloud/mandrill.js');
-	var email = [];
-	email.push({
-        "email" : request.object.get("email")
-    });
-
-	Parse.Cloud.run('sendEmailTemplate', { emails: email, template_name : "lpsignup", subject : "Gracias por tu interés!" })
-	.then(function(resp) {
-		console.log("New user has signed up within the landing page.")
-	});
+	Parse.Cloud.run('sendgridSendEmailTest',
+		{
+		  template_name: "lpsignup",
+		  subject: "Gracias por tu interés!",
+		  to: request.object.get("email"),
+		  from: "hola@permutassep.com",
+		  from_name: "Permutas SEP"
+		}
+	);
 });
 
 Parse.Cloud.afterSave("LPContact", function(request) {
-	var Mandrill = require('cloud/mandrill.js');
-	Mandrill.sendEmail({
-	message: {
-	  text: request.object.get("message"),
-	  subject: "New contact from permutassep.com: " + request.object.get("email"),
-	  from_email: "hola@permutassep.com",
-	  from_name: "Permutas SEP",
-	  to: [
-	    {
-	      email: "hdez.jeduardo@gmail.com"
-	    }
-	  ]
-	},
-	async: true
-	}, {
-		success: function(httpResponse) {
-			console.log("Email sent!");
-		},
-		error: function(httpResponse) {
-			console.log("Uh oh, something went wrong");
+
+	Parse.Cloud.run('sendgridSendEmailTest',
+		{
+		  template_name: "empty-template",
+		  subject: "New contact",
+		  to: "hdez.jeduardo@gmail.com",
+		  from: "hola@permutassep.com",
+		  from_name: "Permutas SEP",
+		  text: 'From: ' + request.object.get("email") + '\n\n' + 'Message: ' + '\n\n' + String(request.object.get("message")),
+		  html: '<p>' + 'From: ' + request.object.get("email") + '\n\n' + 'Message: ' + '\n\n' + String(request.object.get("message")) + '</p>'
 		}
-	});
+	);
 
-	var email = [];
-	email.push({
-        "email" : request.object.get("email")
-    });
-
-	Parse.Cloud.run('sendEmailTemplate', { emails: email, template_name : "lpformcontact" })
-	.then(function(resp) {
-		console.log("Thanks for contact - Email sent!")
-	});
+	Parse.Cloud.run('sendgridSendEmailTest',
+		{
+		  template_name: "lpformcontact",
+		  subject: "Gracias por tu interés!",
+		  to: request.object.get("email"),
+		  from: "hola@permutassep.com",
+		  from_name: "Permutas SEP"
+		}
+	);
 });
 
 Parse.Cloud.beforeSave("Email", function(request, response) {
@@ -380,6 +374,41 @@ Parse.Cloud.define("sendgridSendEmail", function(request, response) {
 		response.error('Status. ' + httpResponse.status + ". Message: " + httpResponse.text)
 	});
 });
+
+Parse.Cloud.define("sendgridSendEmailTest", function(request, response) {
+    
+    var EmailTemplate = Parse.Object.extend("EmailTemplate");
+    var queryTemplate = new Parse.Query(EmailTemplate);
+    queryTemplate.equalTo("TemplateName",request.params.template_name);
+    queryTemplate.first().then(function(template) {
+		Parse.Cloud.httpRequest({
+		  method: 'POST',
+		  url: 'https://api.sendgrid.com/api/mail.send.json',
+		  body: {
+			api_user: "lalongooo",
+			api_key: "Sand191205-",
+			
+			subject: request.params.subject,
+
+			to: request.params.to,
+			from: request.params.from,
+			fromname: request.params.from_name,
+			
+			text : request.params.text ? request.params.text : template.get("TextVersion"),
+			html : request.params.html ? request.params.html : template.get("HtmlContent")
+			
+		  }
+		}).then(function(httpResponse) {	  
+			console.error('Status. ' + httpResponse.status + ". Message: " + httpResponse.text);
+			response.success('Status. ' + httpResponse.status + ". Message: " + httpResponse.text)
+		}, function(httpResponse) {	  
+			console.error('Status. ' + httpResponse.status + ". Message: " + httpResponse.text);
+			response.error('Status. ' + httpResponse.status + ". Message: " + httpResponse.text)
+		});
+    });
+
+});
+
 /*
 * Cloud Code Job Definitions
 */
