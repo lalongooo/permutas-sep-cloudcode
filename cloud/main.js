@@ -100,18 +100,8 @@ Parse.Cloud.afterSave("PSPost", function(request) {
 
 Parse.Cloud.afterSave("PSScrapedPost", function(request) {
 
-	// Después de guardar un ScrapedPost:
-	// Enviar mail con link de Google Play
-	// Guardar Email
-
 	if(request.object.get("email"))
 	{
-
-		var email = [];
-		email.push({
-	        "email" : request.object.get("email")
-	    });
-
 		Parse.Cloud.run('sendgridSendEmailTest',
 			{
 			  template_name: "tulibroinvitation",
@@ -135,7 +125,6 @@ Parse.Cloud.afterSave("PSScrapedPost", function(request) {
 
 					var Email = Parse.Object.extend("Email");
 					var email = new Email();
-
 					email.save({
 					  email: request.object.get("email"),
 					  source: "tulibrodevisitas"
@@ -154,7 +143,6 @@ Parse.Cloud.afterSave("PSScrapedPost", function(request) {
 
 	var phoneNumbers = request.object.get("phoneNumbers");
 	var possiblePhoneNumbers = request.object.get("possiblePhoneNumbers");
-
 
 	if(phoneNumbers.length > 0 || (possiblePhoneNumbers && possiblePhoneNumbers.length > 0))
 	{
@@ -235,7 +223,6 @@ Parse.Cloud.beforeSave("Email", function(request, response) {
         response.error("Could not save new email");
       }
     });
-
 });
 
 
