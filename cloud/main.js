@@ -304,49 +304,6 @@ Parse.Cloud.define("emptyMelodysoft", function(request, response) {
 	});
 });
 
-Parse.Cloud.define("sendEmailTemplate", function(request, response) {
-
-	var Mandrill = require('cloud/mandrill.js');
-
-	Mandrill.sendTemplate(
-
-			request.params.template_name,
-			[{
-				name: "example name",
-				content: "eample content"
-			}],
-			{
-				subject: request.params.subject ? request.params.subject : "Permutas SEP",
-		        from_email: request.params.from ? request.params.from : "hola@permutassep.com",
-		        from_name: 'Permutas SEP',
-		        to: request.params.emails,
-		        headers: {
-		            'Reply To': 'hola@permutassep.com'
-		        },
-	            global_merge_vars: [
-	                {
-	                    "name": "COMPANY",
-	                    "content": "Permutas SEP"
-	                }
-	            ],
-		        important: true,
-		        track_opens: true,
-		        track_clicks: true,
-		        inline_css: true,
-		        tracking_domain: 'permutassep.com',
-		        signing_domain: 'permutassep.com'
-			}
-		).then(
-		function(object) {
-			console.log(object);
-			response.success("Email sent!");
-		},
-		function(error) {
-			console.log(error);
-			response.error("Uh oh, something went wrong");
-		});
-});
-
 Parse.Cloud.define("sendgridSendEmail", function(request, response) {
 	Parse.Cloud.httpRequest({
 	  method: 'POST',
