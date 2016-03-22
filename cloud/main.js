@@ -544,26 +544,19 @@ Parse.Cloud.job('sendEmailCampaign', function (request, status) {
   var query = new Parse.Query(Email);
   query.doesNotExist("campaign15032016");
   query.each(function (email) {
-    
-    var EmailTemplate = Parse.Object.extend("EmailTemplate");
-    var queryTemplate = new Parse.Query(EmailTemplate);
-    queryTemplate.equalTo("TemplateName","march-2016");
-    queryTemplate.first().then(function(template) {
-
-      Parse.Cloud.run('sendgridSendEmail', {
-
-      	subject : "Te ayudamos a encontrar tu permuta",
-		to : email.get("email"),
-		text : template.get("TextVersion"),
-		html : template.get("HtmlContent")
-
-      }).then(function(resp) {      	
-        console.log("Function sendgridSendEmail ran successfully!")
-      });
-
-    });
-    email.set('campaign15032016', true);
-    return email.save();
+	
+	Parse.Cloud.run('sendgridSendEmailTest',
+		{
+		  template_name: "tulibroinvitation",
+		  subject: "Te ayudamos a encontrar tu permuta",
+		  to: email.get("email"),
+		  from: "hola@permutassep.com",
+		  from_name: "Permutas SEP"
+		}
+	);
+	
+	email.set('campaign15032016', true);
+	return email.save();
     
   }).then(function() {
     status.success('Done');
