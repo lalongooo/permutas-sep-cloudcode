@@ -567,11 +567,10 @@ Parse.Cloud.job('sendEmailCampaign', function (request, status) {
 
 Parse.Cloud.job('sendInvitationToNewUsers', function (request, status) {
   
-  var Email = Parse.Object.extend("EmailTest");
+  var Email = Parse.Object.extend("Email");
   var query = new Parse.Query(Email);
-  query.doesNotExist("campaign23032016");
-  query.each(function (emailObject) {  	
-
+  query.doesNotExist("EmailCampaign24032016");
+  query.each(function (emailObject) {
   	
   	var userQuery = new Parse.Query(Parse.User);
   	userQuery.equalTo("email", emailObject.get("email"));
@@ -579,15 +578,12 @@ Parse.Cloud.job('sendInvitationToNewUsers', function (request, status) {
 
   		if(userObject === undefined)
   		{
-
-  			console.log("userObject === null");
-  			console.log(emailObject.get("email"));  			
 			Parse.Cloud.run('sendgridSendEmailTest',
 				{
-				  template_name: "tulibroinvitation",
+				  template_name: "24032016",
 				  subject: "Te ayudamos a encontrar tu permuta",
 				  to: emailObject.get("email"),
-				  from: "hola@permutassep.com",
+				  from: "jorge@permutassep.com",
 				  from_name: "Permutas SEP"
 				}
 			);
@@ -596,13 +592,13 @@ Parse.Cloud.job('sendInvitationToNewUsers', function (request, status) {
   		}
   	});
 	
-	emailObject.set('campaign23032016', true);
+	emailObject.set('EmailCampaign24032016', true);
 	return emailObject.save();
     
   }).then(function() {
     status.success('Done');
   }, function (error) {
-    status.error(String(error));
+    status.error(error.message);
   });
 });
 
