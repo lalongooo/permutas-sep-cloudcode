@@ -203,27 +203,27 @@ Parse.Cloud.afterSave("LPContact", function(request) {
 	);
 });
 
-Parse.Cloud.beforeSave("Email", function(request, response) {
-	
-	var Email = Parse.Object.extend("Email");
-	var query = new Parse.Query(Email);
-    query.equalTo("email", request.object.get("email"));
-    console.log('request.object.get("email") is equal to: ' + request.object.get("email")); 
-    query.first({
-      success: function(object) {
-        if (object) {
-        	console.log("Object equals to " + object);
-        	response.error("Email already exists");
-        } else {
-        	console.log("Email saved correctly");
-        	response.success();
-        }
-      },
-      error: function(error) {
-        response.error("Could not save new email");
-      }
-    });
-});
+// Parse.Cloud.beforeSave("Email", function(request, response) {
+
+// 	var Email = Parse.Object.extend("Email");
+// 	var query = new Parse.Query(Email);
+//     query.equalTo("email", request.object.get("email"));
+//     console.log('request.object.get("email") is equal to: ' + request.object.get("email"));
+//     query.first({
+//       success: function(object) {
+//         if (object) {
+//         	console.log("Object equals to " + object);
+//         	response.error("Email already exists");
+//         } else {
+//         	console.log("Email saved correctly");
+//         	response.success();
+//         }
+//       },
+//       error: function(error) {
+//         response.error("Could not save new email");
+//       }
+//     });
+// });
 
 
 /*
@@ -298,29 +298,29 @@ Parse.Cloud.define("sendgridSendEmail", function(request, response) {
 	  body: {
 		api_user: "lalongooo",
 		api_key: "Sand191205-",
-		
+
 		subject: request.params.subject,
 
 		to: request.params.to,
 		from: "hola@permutassep.com",
 		fromname: "Permutas SEP",
 
-		
+
 		text: request.params.text,
 		html: request.params.html
-		
+
 	  }
-	}).then(function(httpResponse) {	  
+	}).then(function(httpResponse) {
 		console.error('Status. ' + httpResponse.status + ". Message: " + httpResponse.text);
 		response.success('Status. ' + httpResponse.status + ". Message: " + httpResponse.text)
-	}, function(httpResponse) {	  
+	}, function(httpResponse) {
 		console.error('Status. ' + httpResponse.status + ". Message: " + httpResponse.text);
 		response.error('Status. ' + httpResponse.status + ". Message: " + httpResponse.text)
 	});
 });
 
 Parse.Cloud.define("sendgridSendEmailTest", function(request, response) {
-    
+
     var EmailTemplate = Parse.Object.extend("EmailTemplate");
     var queryTemplate = new Parse.Query(EmailTemplate);
     queryTemplate.equalTo("TemplateName",request.params.template_name);
@@ -331,21 +331,21 @@ Parse.Cloud.define("sendgridSendEmailTest", function(request, response) {
 		  body: {
 			api_user: "lalongooo",
 			api_key: "Sand191205-",
-			
+
 			subject: request.params.subject,
 
 			to: request.params.to,
 			from: request.params.from,
 			fromname: request.params.from_name,
-			
+
 			text : request.params.text ? request.params.text : template.get("TextVersion"),
 			html : request.params.html ? request.params.html : template.get("HtmlContent")
-			
+
 		  }
-		}).then(function(httpResponse) {	  
+		}).then(function(httpResponse) {
 			console.error('Status. ' + httpResponse.status + ". Message: " + httpResponse.text);
 			response.success('Status. ' + httpResponse.status + ". Message: " + httpResponse.text)
-		}, function(httpResponse) {	  
+		}, function(httpResponse) {
 			console.error('Status. ' + httpResponse.status + ". Message: " + httpResponse.text);
 			response.error('Status. ' + httpResponse.status + ". Message: " + httpResponse.text)
 		});
@@ -442,7 +442,7 @@ Parse.Cloud.job('postDateMigrationPromise', function (request, status) {
   Parse.Cloud.useMasterKey();
 
   var query = new Parse.Query("PSScrapedPost");
-  
+
   // Condition to fix dates from tulibrodevisitas.com
   query.doesNotExist("host");
 
@@ -491,13 +491,13 @@ Parse.Cloud.job('getPhoneNumbers', function (request, status) {
 
   Parse.Cloud.useMasterKey();
 
-  var query = new Parse.Query("PSScrapedPost");  
+  var query = new Parse.Query("PSScrapedPost");
   query.doesNotExist("phoneNumbers");
   query.each(function (scrapedPost) {
 
 	var post = scrapedPost.get("post");
 	var phoneNumbers = [];
-  	var regExp = /(\d{4}[-\.\s]??\d{6}|\d{3}[-\.\s]??\d{3}[-\.\s]??\d{2}[-\.\s]??\d{2}|\d{2}[-\.\s]??\d{2}[-\.\s]??\d{3}[-\.\s]??\d{3}|\d{2}[-\.\s]??\d{2}[-\.\s]??\d{2}[-\.\s]??\d{2}[-\.\s]??\d{2}|\d{2}[-\.\s]??\d{2}[-\.\s]??\d{3}[-\.\s]??\d{1}[-\.\s]??\d{2}|\d{3}[-\.\s]??\d{2}[-\.\s]??\d{1}[-\.\s]??\d{2}[-\.\s]??\d{2}|\d{3}[-\.\s]??\d{1}[-\.\s]??\d{2}[-\.\s]??\d{2}[-\.\s]??\d{2}|\d{3}[-\.\s]??\d{2}[-\.\s]??\d{2}[-\.\s]??\d{1}[-\.\s]??\d{2}|\d{3}[-\.\s]??\d{2}[-\.\s]??\d{2}[-\.\s]??\d{1}[-\.\s]??\d{2}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4})/g;	
+  	var regExp = /(\d{4}[-\.\s]??\d{6}|\d{3}[-\.\s]??\d{3}[-\.\s]??\d{2}[-\.\s]??\d{2}|\d{2}[-\.\s]??\d{2}[-\.\s]??\d{3}[-\.\s]??\d{3}|\d{2}[-\.\s]??\d{2}[-\.\s]??\d{2}[-\.\s]??\d{2}[-\.\s]??\d{2}|\d{2}[-\.\s]??\d{2}[-\.\s]??\d{3}[-\.\s]??\d{1}[-\.\s]??\d{2}|\d{3}[-\.\s]??\d{2}[-\.\s]??\d{1}[-\.\s]??\d{2}[-\.\s]??\d{2}|\d{3}[-\.\s]??\d{1}[-\.\s]??\d{2}[-\.\s]??\d{2}[-\.\s]??\d{2}|\d{3}[-\.\s]??\d{2}[-\.\s]??\d{2}[-\.\s]??\d{1}[-\.\s]??\d{2}|\d{3}[-\.\s]??\d{2}[-\.\s]??\d{2}[-\.\s]??\d{1}[-\.\s]??\d{2}|\(\d{3}\)\s*\d{3}[-\.\s]??\d{4}|\d{3}[-\.\s]??\d{4})/g;
 	var match = regExp.exec(post);
 
 	while (match != null) {
@@ -520,15 +520,15 @@ Parse.Cloud.job('getPhoneNumbers', function (request, status) {
         } else {
         	post = post.replace(/[^\d]/g,'');
         }
-        
+
         if (post.length >= 10)
         {
         	phoneNumbers.push(post);
         	scrapedPost.set("possiblePhoneNumbers", phoneNumbers);
         	scrapedPost.save();
-        }		        
+        }
 	}
-    
+
     return scrapedPost.save();
 
   }).then(function(){
@@ -539,12 +539,12 @@ Parse.Cloud.job('getPhoneNumbers', function (request, status) {
 });
 
 Parse.Cloud.job('sendEmailCampaign', function (request, status) {
-  
+
   var Email = Parse.Object.extend("EmailTest");
   var query = new Parse.Query(Email);
   query.doesNotExist("campaign15032016");
   query.each(function (email) {
-	
+
 	Parse.Cloud.run('sendgridSendEmailTest',
 		{
 		  template_name: "tulibroinvitation",
@@ -554,10 +554,10 @@ Parse.Cloud.job('sendEmailCampaign', function (request, status) {
 		  from_name: "Permutas SEP"
 		}
 	);
-	
+
 	email.set('campaign15032016', true);
 	return email.save();
-    
+
   }).then(function() {
     status.success('Done');
   }, function (error) {
@@ -566,12 +566,12 @@ Parse.Cloud.job('sendEmailCampaign', function (request, status) {
 });
 
 Parse.Cloud.job('sendInvitationToNewUsers', function (request, status) {
-  
+
   var Email = Parse.Object.extend("Email");
   var query = new Parse.Query(Email);
-  query.doesNotExist("EmailCampaign24032016");
+  query.doesNotExist("WebAppAnnouncement");
   query.each(function (emailObject) {
-  	
+
   	var userQuery = new Parse.Query(Parse.User);
   	userQuery.equalTo("email", emailObject.get("email"));
   	userQuery.first().then(function(userObject) {
@@ -580,10 +580,10 @@ Parse.Cloud.job('sendInvitationToNewUsers', function (request, status) {
   		{
 			Parse.Cloud.run('sendgridSendEmailTest',
 				{
-				  template_name: "24032016",
-				  subject: "Te ayudamos a encontrar tu permuta",
+				  template_name: "webappannouncement",
+				  subject: "Encuentra tu permuta desde nuestro sitio web",
 				  to: emailObject.get("email"),
-				  from: "jorge@permutassep.com",
+				  from: "hola@permutassep.com",
 				  from_name: "Permutas SEP"
 				}
 			);
@@ -591,10 +591,10 @@ Parse.Cloud.job('sendInvitationToNewUsers', function (request, status) {
   			console.log(userObject.get("email") + ' already registered within the app');
   		}
   	});
-	
-	emailObject.set('EmailCampaign24032016', true);
+
+	emailObject.set('WebAppAnnouncement', true);
 	return emailObject.save();
-    
+
   }).then(function() {
     status.success('Done');
   }, function (error) {
