@@ -603,6 +603,70 @@ Parse.Cloud.job('sendInvitationToNewUsers', function (request, status) {
 });
 
 
+
+// Parse.Cloud.define("sendgridSendEmailTest", function(request, response) {
+
+Parse.Cloud.define("notifyRegisteredUsers", function(request, response) {
+    /**
+    * Prepare the query for the template
+    */
+
+    /**
+
+
+	A request data templata:
+
+	{
+	  "template_name": "webappannouncement",
+	  "subject": "Encuentra tu permuta desde nuestro sitio web",
+	  "from": "hola@permutassep.com",
+	  "from_name": "Permutas SEP"
+	}
+
+    */
+
+    Parse.Cloud.useMasterKey();
+    var EmailTemplate = Parse.Object.extend("EmailTemplate");
+    var queryTemplate = new Parse.Query(EmailTemplate);
+    queryTemplate.equalTo("TemplateName",request.params.template_name);
+    queryTemplate.first().then(function(template) {
+
+    	var activeUsers = new Parse.Query(Parse.User);
+    	activeUsers.doesNotExist("notified01");
+    	activeUsers.each(function(user) {
+
+    		user.set("notified01", true);
+			return user.save().then(function(savedUser){
+
+				console.log("Notifying " + savedUser.get("email"));
+
+				return Parse.Cloud.httpRequest({
+				  method: 'POST',
+				  url: 'https://api.sendgrid.com/api/mail.send.json',
+				  body: {
+					api_user: "lalongooo",
+					api_key: "Sand191205-",
+					subject: request.params.subject,
+					to: savedUser.get("email"),
+					from: request.params.from,
+					fromname: request.params.from_name,
+					text : template.get("TextVersion"),
+					html : template.get("HtmlContent")
+				  }
+				});
+
+			});
+
+    	}).then(function(httpResponse) {
+    		response.success('Success.');    	
+    	}, function(error) {
+    		response.error('Error: ' + error.message);
+    	});
+
+    });
+
+});
+
 /*
 * Helper functions/code sytax/utilities/etc
 */
